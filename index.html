@@ -3252,7 +3252,22 @@ function addTradeInOption(container) {
   function buildLineItemsFreeform(){
     const lines = [];
 
-    // DG（刺繍ソフト）を先に追加
+    // FREEFORM 明細を先に追加
+    (freeformLines || []).forEach(ln => {
+      if(!ln) return;
+      if(ln.type === 'product'){
+        const name = (ln.name ?? '').trim();
+        const qty = (ln.qty ?? 0);
+        const unit = (ln.unitPrice ?? 0);
+        // 空でも行として残したい場合があるので、name空はスキップしない
+        lines.push({ name: name, qty: qty === 0 ? '' : qty, unitPrice: unit === 0 ? '' : unit });
+      }else{
+        const name = (ln.name ?? '').trim();
+        lines.push({ name: name, qty:'', unitPrice:'' });
+      }
+    });
+
+    // DG（刺繍ソフト）をフリーフォームの後に追加
     const dg = getSelectedDG();
     if(dg){
       const dgQty = Math.max(1, parseInt(document.getElementById('dgQty')?.value || '1', 10));
@@ -3270,21 +3285,6 @@ function addTradeInOption(container) {
       }
       getSelectedDGLan(dg).forEach(it => lines.push(it));
     }
-
-    // FREEFORM 明細を後から追加
-    (freeformLines || []).forEach(ln => {
-      if(!ln) return;
-      if(ln.type === 'product'){
-        const name = (ln.name ?? '').trim();
-        const qty = (ln.qty ?? 0);
-        const unit = (ln.unitPrice ?? 0);
-        // 空でも行として残したい場合があるので、name空はスキップしない
-        lines.push({ name: name, qty: qty === 0 ? '' : qty, unitPrice: unit === 0 ? '' : unit });
-      }else{
-        const name = (ln.name ?? '').trim();
-        lines.push({ name: name, qty:'', unitPrice:'' });
-      }
-    });
 
     return lines;
   }
@@ -3770,5 +3770,3 @@ updateOptionsList();
 </script>
 </body>
 </html>
-
-
