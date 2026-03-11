@@ -480,6 +480,7 @@
       padding: 2.5mm;
       box-sizing:border-box;
       font-size: 12px;
+      white-space: pre-wrap;
     }
     .totals{
       border: var(--thin) solid var(--border);
@@ -3528,7 +3529,7 @@ function addTradeInOption(container) {
       tbody.appendChild(tr);
     });
 
-    const tax = Math.round(subtotal * TAX_RATE);
+    const tax = Math.floor(subtotal * TAX_RATE);
     const total = subtotal + tax;
 
     {
@@ -3770,3 +3771,4 @@ updateOptionsList();
 </script>
 </body>
 </html>
+
