@@ -754,6 +754,32 @@
 <input class="qty" id="dgQty" min="1" oninput="applyAndRender()" step="1" type="number" value="1"/>
 </div>
 </div>
+<details class="opt-panel" id="dgUpgradePanel" style="margin-top:14px">
+<summary class="opt-head" style="margin:0">アップグレード価格（DG17内） <span class="muted" id="dgUpgradeSummary"></span></summary>
+<div class="row" style="margin-top:10px">
+<div style="flex:1">
+<select id="dgUpgrade" style="width:100%"></select>
+<div class="muted" style="margin-top:6px">※ DG17内アップグレード価格を選択できます</div>
+</div>
+<div style="width:130px">
+<label>数量</label>
+<input class="qty" id="dgUpgradeQty" min="1" oninput="applyAndRender()" step="1" type="number" value="1"/>
+</div>
+</div>
+</details>
+<details class="opt-panel" id="dgI2Panel" style="margin-top:14px">
+<summary class="opt-head" style="margin:0">Embroidery i2（エンブロイダリ アイスクエア） <span class="muted" id="dgI2Summary"></span></summary>
+<div class="row" style="margin-top:10px">
+<div style="flex:1">
+<select id="dgI2" style="width:100%"></select>
+<div class="muted" style="margin-top:6px">※ Adobe Illustratorプラグイン型刺繍ソフト。DGグレード未選択でも単独で見積可能</div>
+</div>
+<div style="width:130px">
+<label>数量</label>
+<input class="qty" id="dgI2Qty" min="1" oninput="applyAndRender()" step="1" type="number" value="1"/>
+</div>
+</div>
+</details>
 <details class="opt-panel" id="dgOptPanel" style="margin-top:14px">
 <summary class="opt-head" style="margin:0">DGオプション（グレード連動） <span class="muted" id="dgOptSummary"></span></summary>
 <div class="opt-row off" id="dgopt_row_DG_LESSON" style="margin-top:10px">
@@ -1645,16 +1671,29 @@ console.log('SEID not created yet:', {
   // =========================================================
   const DG_SOFTWARE = [
     { id:'WRITER_PLUS', name:'Writer Plus（彩 付属）', price:0, optionsEnabled:false, fontsEnabled:false, lanRule:'WP' },
-    { id:'EXPRESS', name:'DG17 EXPRESS', price:175000, optionsEnabled:false, fontsEnabled:false, lanRule:'DG' },
-    { id:'COMPOSER', name:'DG17 COMPOSER', price:388000, optionsEnabled:true,  fontsEnabled:true,  lanRule:'DG' },
-    { id:'CREATOR', name:'DG17 CREATOR', price:651000, optionsEnabled:true,  fontsEnabled:true,  lanRule:'DG' },
-    { id:'ILLUSTRATOR_EXTREME', name:'DG17 ILLUSTRATOR EXTREME', price:777000, optionsEnabled:true,  fontsEnabled:true,  lanRule:'DG' },
-    { id:'ARTIST_PLUS', name:'DG17 ARTIST PLUS', price:1029000, optionsEnabled:true,  fontsEnabled:true,  lanRule:'DG' },
-    { id:'MAESTRO', name:'DG17 MAESTRO', price:1406000, optionsEnabled:true,  fontsEnabled:true,  lanRule:'DG' },
-    { id:'DG_S', name:'DG-S', price:302000, optionsEnabled:false, fontsEnabled:false, lanRule:'DG' }
+    { id:'EXPRESS_1', name:'DG17 EXPRESS（LANライセンス1台分）※ドングルなし', price:100000, optionsEnabled:false, fontsEnabled:false, lanRule:'DG' },
+    { id:'EXPRESS_5', name:'DG17 EXPRESS（LANライセンス5台分）※ドングルなし', price:151000, optionsEnabled:false, fontsEnabled:false, lanRule:'DG' },
+    { id:'COMPOSER', name:'DG17 COMPOSER ドングル付き', price:447000, optionsEnabled:true,  fontsEnabled:true,  lanRule:'DG' },
+    { id:'CREATOR', name:'DG17 CREATOR ドングル付き', price:623000, optionsEnabled:true,  fontsEnabled:true,  lanRule:'DG' },
+    { id:'ILLUSTRATOR_EXTREME', name:'DG17 ILLUSTRATOR EXTREME ドングル付き', price:842000, optionsEnabled:true,  fontsEnabled:true,  lanRule:'DG' },
+    { id:'ARTIST_PLUS', name:'DG17 ARTIST PLUS ドングル付き', price:1094000, optionsEnabled:true,  fontsEnabled:true,  lanRule:'DG' },
+    { id:'MAESTRO', name:'DG17 MAESTRO ドングル付き', price:1471000, optionsEnabled:true,  fontsEnabled:true,  lanRule:'DG' },
+    { id:'DG_S', name:'DG-S ドングル付き', price:563000, optionsEnabled:true, fontsEnabled:false, lanRule:'DG' }
   ];
 
   // minGrade は「このグレード以上」で選択可（DG-Sは判定対象外なので入れない）
+  const DG_UPGRADES = [
+    { id:'UPG_CREATOR_TO_ILLUSTRATOR_EXTREME', name:'CREATORからILLUSTRATOR EXTREME', price:283000 },
+    { id:'UPG_CREATOR_TO_ARTIST_PLUS', name:'CREATORからARTIST PLUS', price:535000 },
+    { id:'UPG_ILLUSTRATOR_EXTREME_TO_ARTIST_PLUS', name:'ILLUSTRATOR EXTREMEからARTIST PLUS', price:316000 },
+    { id:'UPG_ARTIST_PLUS_TO_MAESTRO', name:'ARTIST PLUSからMAESTRO', price:441000 }
+  ];
+
+  const DG_I2_PRODUCTS = [
+    { id:'I2_STANDARD', name:'Embroidery i2 Adobe illustrator向け',         price:1406000 },
+    { id:'I2_WITH_DG',  name:'Embroidery i2 Adobe illustrator向け（DG有）', price:777000  }
+  ];
+
   const DG_OPTIONS = [
     { id:'ELEMENT', name:'エレメント', price:73000, minGrade:'CREATOR' },
     { id:'EVERYTHING_SEQUIN_PACK', name:'エブリシングシークインパック', price:399000, minGrade:'CREATOR' },
@@ -1662,8 +1701,10 @@ console.log('SEID not created yet:', {
     { id:'PHOTO_CREATOR', name:'フォトクリエーター', price:157000, minGrade:'ILLUSTRATOR_EXTREME' },
     { id:'CHENILLE', name:'シュニール', price:204000, minGrade:'CREATOR' },
     { id:'DIRECT_MACHINE_HOLDER', name:'ダイレクトマシンホルダー', price:51000, minGrade:'COMPOSER' },
-    { id:'CHENILLE_LETTERING', name:'シェニールレタリング', price:78000, minGrade:'COMPOSER' },
-    { id:'HEAD_GROUP', name:'ヘッドグループ（刺繍機ヘッド選択）', price:178000, minGrade:'ILLUSTRATOR_EXTREME' }
+    { id:'CHENILLE_LETTERING', name:'シュニールレタリング', price:78000, minGrade:'COMPOSER' },
+    { id:'HEAD_GROUP', name:'ヘッドグループ（刺繍機ヘッド選択）', price:178000, minGrade:'ILLUSTRATOR_EXTREME' },
+    { id:'PERFORATION_EXISTING_DGS', name:'パーフォーレーションオプション 既存DG-Sユーザー限定', price:40000, onlyFor:['DG_S'] },
+    { id:'PERFORATION_NEW_USER', name:'パーフォーレーションオプション 既存DG-Sユーザー以外', price:204000, onlyFor:['DG_S'] }
   ];
 
   const DG_FONTS = [
@@ -1671,7 +1712,7 @@ console.log('SEID not created yet:', {
     { id:'SEQUIN_FONT_PACK', name:'シークインフォントパック', price:92000, minGrade:'COMPOSER' },
     { id:'MONOGRAM_FONT_PACK', name:'モノグラムフォントパック', price:92000, minGrade:'COMPOSER' },
     { id:'PLATINUM_FONT_PACK', name:'プラチナムフォントパック', price:237000, minGrade:'COMPOSER' },
-    { id:'FONT_MEDLEY', name:'フォントメドレー', price:72000, minGrade:'COMPOSER' },
+    { id:'FONT_MEDLEY', name:'フォントメドレー', price:92000, minGrade:'COMPOSER' },
     { id:'SYMPHONY_1_FONT_PACK', name:'シンフォニー1 フォントパック', price:55000, minGrade:'COMPOSER' },
     { id:'NONAKA_FONT', name:'野中フォント', price:72000, minGrade:'COMPOSER' },
     { id:'TAJIMA_JP_FONT_DGA', name:'タジマ日本語フォント：DG:A', price:95000, minGrade:'COMPOSER' },
@@ -2943,6 +2984,59 @@ function addTradeInOption(container) {
     });
   }
 
+  function renderDGUpgradeSelect(){
+    const sel = document.getElementById('dgUpgrade');
+    if(!sel) return;
+    sel.innerHTML = '';
+    const none = document.createElement('option');
+    none.value = '';
+    none.textContent = '選択しない';
+    sel.appendChild(none);
+    DG_UPGRADES.forEach(s => {
+      const o = document.createElement('option');
+      o.value = s.id;
+      o.textContent = `${s.name}（${s.price.toLocaleString()}円）`;
+      sel.appendChild(o);
+    });
+  }
+
+  function getSelectedDGUpgrade(){
+    const id = document.getElementById('dgUpgrade')?.value || '';
+    if(!id) return null;
+    return DG_UPGRADES.find(x => x.id === id) || null;
+  }
+
+  function renderDGI2Select(){
+    const sel = document.getElementById('dgI2');
+    if(!sel) return;
+    sel.innerHTML = '';
+    const none = document.createElement('option');
+    none.value = '';
+    none.textContent = '選択しない';
+    sel.appendChild(none);
+    DG_I2_PRODUCTS.forEach(s => {
+      const o = document.createElement('option');
+      o.value = s.id;
+      o.textContent = `${s.name}（${s.price.toLocaleString()}円）`;
+      sel.appendChild(o);
+    });
+  }
+
+  function getSelectedDGI2(){
+    const id = document.getElementById('dgI2')?.value || '';
+    if(!id) return null;
+    return DG_I2_PRODUCTS.find(x => x.id === id) || null;
+  }
+
+  function updateDGI2Summary(){
+    const sumEl = document.getElementById('dgI2Summary');
+    if(!sumEl) return;
+    const i2 = getSelectedDGI2();
+    if(!i2){ sumEl.textContent = ''; return; }
+    const qty = Math.max(1, parseInt(document.getElementById('dgI2Qty')?.value || '1', 10));
+    sumEl.textContent = `${i2.name}（${(i2.price * qty).toLocaleString()}円）`;
+  }
+
   function renderDGToggleItem(container, item, prefix){
     const div = document.createElement('div');
     div.className = 'opt-row off';
@@ -3086,6 +3180,8 @@ function addTradeInOption(container) {
 
   function initDGSoftwareUI(){
     renderDGSelect();
+    renderDGUpgradeSelect();
+    renderDGI2Select();
     const sel = document.getElementById('dgGrade');
     if(sel){
       sel.addEventListener('change', ()=>{
@@ -3098,14 +3194,34 @@ function addTradeInOption(container) {
         applyAndRender();
       });
     }
+    const upSel = document.getElementById('dgUpgrade');
+    if(upSel){
+      upSel.addEventListener('change', ()=>{
+        applyAndRender();
+      });
+    }
+    const i2Sel = document.getElementById('dgI2');
+    if(i2Sel){
+      i2Sel.addEventListener('change', ()=>{
+        updateDGI2Summary();
+        applyAndRender();
+      });
+    }
+    document.getElementById('dgI2Qty')?.addEventListener('input', ()=>{
+      updateDGI2Summary();
+    });
 
     // 初期は非表示
     renderDGLists();
 
     // 各パネルを閉じておく（起動時クローズ運用）
+    const upgradePanel = document.getElementById('dgUpgradePanel');
+    const i2Panel      = document.getElementById('dgI2Panel');
     const optPanel = document.getElementById('dgOptPanel');
     const fontPanel = document.getElementById('dgFontPanel');
     const lanPanel = document.getElementById('dgLanPanel');
+    if(upgradePanel) upgradePanel.open = false;
+    if(i2Panel)      i2Panel.open      = false;
     if(optPanel) optPanel.open = false;
     if(fontPanel) fontPanel.open = false;
     if(lanPanel) lanPanel.open = false;
@@ -3283,6 +3399,20 @@ function addTradeInOption(container) {
         getSelectedDGItems('dgfont', fontMaster).forEach(it => lines.push(it));
       }
       getSelectedDGLan(dg).forEach(it => lines.push(it));
+    }
+
+    // アップグレード価格（DG17内）：DGグレード選択とは独立して帳票に反映
+    const dgUpgrade = getSelectedDGUpgrade();
+    if(dgUpgrade){
+      const dgUpgradeQty = Math.max(1, parseInt(document.getElementById('dgUpgradeQty')?.value || '1', 10));
+      lines.push({ name: `アップグレード価格（DG17内）：${dgUpgrade.name}`, qty: dgUpgradeQty, unitPrice: dgUpgrade.price });
+    }
+
+    // Embroidery i2：アップグレードの直下、DGグレード選択とは独立して帳票に反映
+    const dgI2 = getSelectedDGI2();
+    if(dgI2){
+      const dgI2Qty = Math.max(1, parseInt(document.getElementById('dgI2Qty')?.value || '1', 10));
+      lines.push({ name: `刺繍ソフト：${dgI2.name}`, qty: dgI2Qty, unitPrice: dgI2.price });
     }
 
     return lines;
@@ -3705,12 +3835,19 @@ updateOptionsList();
   function resetDGSoftware(){
     const grade = document.getElementById("dgGrade");
     const qty = document.getElementById("dgQty");
+    const upgrade    = document.getElementById("dgUpgrade");
+    const upgradeQty = document.getElementById("dgUpgradeQty");
+    const i2     = document.getElementById("dgI2");
+    const i2Qty  = document.getElementById("dgI2Qty");
 
     if(qty) qty.value = "1";
+    if(upgradeQty) upgradeQty.value = "1";
+    if(i2Qty)      i2Qty.value      = "1";
 
-    if(grade){
-      grade.value = "";
-    }
+    if(grade)   grade.value   = "";
+    if(upgrade) upgrade.value = "";
+    if(i2)      i2.value      = "";
+    try{ updateDGI2Summary(); }catch(e){}
 
     // 一旦チェックを外す（残存DOMがある場合の安全策）
     ["dgopt","dgfont","dglan"].forEach(prefix=>{
@@ -3735,9 +3872,13 @@ updateOptionsList();
     if(lrow) lrow.className = 'opt-row off';
 
     // パネルは閉じておく
+    const upgradePanel = document.getElementById("dgUpgradePanel");
+    const i2Panel      = document.getElementById("dgI2Panel");
     const optPanel = document.getElementById("dgOptPanel");
     const fontPanel = document.getElementById("dgFontPanel");
     const lanPanel = document.getElementById("dgLanPanel");
+    if(upgradePanel) upgradePanel.open = false;
+    if(i2Panel)      i2Panel.open      = false;
     if(optPanel) optPanel.open = false;
     if(fontPanel) fontPanel.open = false;
     if(lanPanel) lanPanel.open = false;
